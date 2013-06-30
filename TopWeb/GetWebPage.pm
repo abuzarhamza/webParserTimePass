@@ -1,4 +1,7 @@
 package TopWeb::GetWebPage.pm;
+use strict;
+use warnings;
+
 use LWP 5.64;
 
 
@@ -41,10 +44,12 @@ sub AUTOLOAD {
 
 
 =head
-GetWebPage 
+SetWebLink : set the page link to obtain
+@in        :
+@out       : 
 =cut
 
-sub SetWebPage {
+sub SetWebLink {
 	my ($self,$weblink) = @_;
 
 	if (ref($weblink) ne  'SCALAR') {
@@ -55,6 +60,11 @@ sub SetWebPage {
 	return $self->{_weblink};
 }
 
+=head
+GetWebPage : set the page link to obtain
+@in        :
+@out       : 
+=cut
 sub GetWebPage {
 
 	my ($self) = (@_);
