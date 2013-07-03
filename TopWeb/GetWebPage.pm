@@ -1,13 +1,17 @@
-package TopWeb::GetWebPage.pm;
+package TopWeb::GetWebPage;
 use strict;
 use warnings;
+use Carp;
+#use Exporter;
 
-use LWP 5.64;
+
+use LWP;
 
 
-our $VERSION = 1.0
-our Export   = (GetWebPage SaveWebPage);
-
+our $VERSION     = 1.0;
+# our @ISA         = qw(Exporter);
+# our @Export      = qw(GetWebPage SaveWebPage);
+# our @EXPORT_OK   = qw();
 
 sub new {
 
@@ -23,36 +27,22 @@ sub new {
     return $self;
 }
 
-sub AUTOLOAD {
-   my $self  = shift;
-   my $type  = ref ($self) || croak "$self is not an object";
-   my $field = $AUTOLOAD;
-   $field =~ s/.*://;
-
-   unless (exists $self->{$field}) {
-      croak "$field does not exist in object/class $type";
-   }
-
-   if (@_) {
-      return $self->($name) = shift;
-   }
-   else {
-      return $self->($name);
-   }
-
-}
-
 
 =head
 SetWebLink : set the page link to obtain
-@in        :
+@in        : 
 @out       : 
 =cut
 
 sub SetWebLink {
 	my ($self,$weblink) = @_;
 
-	if (ref($weblink) ne  'SCALAR') {
+
+	if (ref($weblink) ne  '') {
+		die "the value passed is incorrect\n";
+	}
+
+	if ($weblink eq '') {
 		die "the value passed is incorrect\n";
 	}
 
@@ -77,26 +67,40 @@ sub GetWebPage {
 	my $response = $browser->get( $self->{_weblink} );
 
 
-  	die "Can't get $url -- ", $response->status_line
+  	die "Can't get $self->{_weblink} -- ", $response->status_line
    	unless $response->is_success;
 
+   	#$self->{_content} = $response->decode_content;
    	$self->{_content} = $response->content;
 
+   	return $self->{_content};
 }
 
-
+=head
+SetFileName : set file name
+@in         : 
+@out        : 
+=cut
 sub SetFileName {
 	my ($self,$file_name) = @_;
 
-	if (ref($file_name)  ne 'SCALAR') {
+	if (ref($file_name)  ne '') {
 		die "incorrect value send";
+	}
+
+	if ($file_name eq '') {
+		die "empty value";
 	}
 
 	$self->{_file_name} = $file_name;
 	return $self->{_file_name};
 }
 
-
+=head
+WriteToFile : write the obtain content to teh file
+@in         : 
+@out        : 
+=cut
 sub WriteToFile {
 
 	my ($self) = @_;
@@ -105,10 +109,27 @@ sub WriteToFile {
 		die "file name is not set\n";
 	}
 
-
-	open(FILE,">$self->{_content}") or die "cant open the file : $!\n";
+	open(FILE,">$self->{_file_name}") or die "cant open the file $self->{_file_name} : $!\n";
 	print FILE "$self->{_content}";
 	close FILE;
+
+
+}
+
+=head
+CheckOutput : to check the output for the key
+@in         : 
+@out        : 
+=cut
+sub CheckOutput {
+
+	my ($self,$key) = @_;
+
+	if ($self->{$key} eq "") {
+		die "file name is not set\n";
+	}
+
+	print "$self->{$key}\n";
 
 
 }
