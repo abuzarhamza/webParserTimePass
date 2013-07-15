@@ -63,6 +63,7 @@ sub ParseSinglePage {
 	}
 
 
+
 	my $content = $tree->look_down('_tag', 'div', 'class', 'postContent text_justify');
 	if ($content) {
 		
@@ -102,6 +103,16 @@ sub ParseSinglePage {
 	else {
 		warn "No heading in $_[0]?";
 	}
+
+	#<iframe width="100%" height="325" frameborder="0" allowfullscreen="" src="http://www.youtube.com/embed/4xCdehrV96U?rel=0&iv_load_policy=3">
+	my $vid = $tree->look_down('_tag', 'iframe', 'width', '100%' , 'height' , '325');
+	if ($vid) {
+		$vedioLink = $vid->attr('src');
+	}
+	else {
+		warn "No vedio link in $_[0]?";	
+	}
+
 
 	$tree->delete;
 
