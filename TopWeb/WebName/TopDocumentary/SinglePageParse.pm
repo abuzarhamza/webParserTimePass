@@ -19,7 +19,7 @@ sub new {
 
 
 
-sub parseSinglePage {
+sub ParseSinglePage {
 
 	my ($self,$file_content) = @_;
 
@@ -33,15 +33,15 @@ sub parseSinglePage {
 
 	#<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
 
-	foreach @fileContent {
-		#encoding
-		if ($_=~ qq{<meta content=\"text/html; charset=(.+)\" http-equiv=\"Content-Type\">}) {
-			$charEncode = $1;
-			last;
-		}
-	}
+	# foreach @fileContent {
+	# 	#encoding
+	# 	if ($_=~ qq{<meta content=\"text/html; charset=(.+)\" http-equiv=\"Content-Type\">}) {
+	# 		$charEncode = $1;
+	# 		last;
+	# 	}
+	# }
 
-	my $p = "";
+
 
 	my $tree = HTML::TreeBuilder->new();
 	$tree->parse($file_content);
@@ -51,7 +51,7 @@ sub parseSinglePage {
 	if ($h1) {
 	  $title = $h1->as_text;
 	} else {
-	  warn "No heading in $_[0]?";
+	  warn "No title in $_[0]?";
 	}
 
 
@@ -59,14 +59,15 @@ sub parseSinglePage {
 	if ($cat) {
 		$category = $cat->as_text;
 	} else {
-	  warn "No heading in $_[0]?";
+	  warn "No category in $_[0]?";
 	}
 
 
 	my $content = $tree->look_down('_tag', 'div', 'class', 'postContent text_justify');
 	if ($content) {
 		
-		my $des = $content->content_list ;
+		my ($des) = $content->content_list ;
+
 		if ($des) {
 			
 			my $img = $des->look_down(_tag,'img');
@@ -75,14 +76,14 @@ sub parseSinglePage {
 				$imgLink = $img->attr('src');
 			} 
 			else {
-				warn "No content list in $_[0]?";
+				warn "No imgLink in $_[0]?";
 			}
 			
-			my @p = $des->look_down(_tag,'p');
+			my (@p) = $des->look_down(_tag,'p');
 			foreach (@p) {
 				if ($_) {
 					
-					if ($description ne '' ) {
+					if ($description eq '' ) {
 						$description = $_->as_text;
 					} 
 					else {
@@ -90,7 +91,7 @@ sub parseSinglePage {
 					}
 				}
 				else {
-					warn "No description list in $_[0]?";
+					warn "No para list in $_[0]?";
 				}
 			}
 		}
@@ -101,23 +102,41 @@ sub parseSinglePage {
 	else {
 		warn "No heading in $_[0]?";
 	}
-	
+
+	$tree->delete;
+
+	$self->{_title}       = $title;
+	$self->{_category}    = $category;
+	$self->{_image_link}  = $imgLink;
+	$self->{_description} = $description;
+	$self->{_vedio_link}  = $vedioLink;
+
+	return $self;
 	
 }
 
 
 
-sub  start_handler{
+sub  GetHtmlElement {
 
+	my ($self,$html_elment)  = @_;
 
-	if () {
-
+	if (ref($html_elment) ne '' ) {
+		die "value passed is incorrect\n";
 	}
+
+	if ($html_elment eq '') {
+		die "empty value passed is incorrect\n"
+	}
+
+	if (exists $self->{$html_elment} ) {
+		return $self->{$html_elment};
+	}
+	else {
+		return "";
+	}
+
 }
-
-
-
-
 
 
 

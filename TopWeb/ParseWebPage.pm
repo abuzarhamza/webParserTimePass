@@ -43,22 +43,22 @@ sub ParseHtmlPage {
 	}
 
 	
-	$object->parseSinglePage($self->{_content});
+	$object->ParseSinglePage($self->{_content});
 
 	$self->SetCharacterEncoding(
-							$object->GetHtmlElement('character_encoding')
+							$object->GetHtmlElement('_character_encoding')
 		);
 
 	$self->SetImageLink(
-							$object->GetHtmlElement('image_link')
+							$object->GetHtmlElement('_image_link')
 		);
 
 	$self->SetTittle(
-							$object->GetHtmlElement('tittle')
+							$object->GetHtmlElement('_title')
 		);
 
 	$self->SetDescription(
-							$object->GetHtmlElement('description')
+							$object->GetHtmlElement('_description')
 		);
 
 }
