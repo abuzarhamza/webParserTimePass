@@ -117,6 +117,27 @@ sub WriteToFile {
 }
 
 =head
+ReadFromFile : to read the input from file
+@in          : 
+@out         : 
+=cut
+sub ReadFromFile {
+
+	my ($self) = @_;
+
+	if ($self->{_file_name} eq "") {
+		die "file name is not set\n";
+	}
+
+	open(READ,"$self->{_file_name}") or die "cant open the file $self->{_file_name} : $!\n";
+	my $fileContent = <READ>;
+	close READ;
+
+	$self->{_file_content} = $fileContent;
+	return $self->{_file_content};
+}
+
+=head
 CheckOutput : to check the output for the key
 @in         : 
 @out        : 
