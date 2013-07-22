@@ -70,6 +70,7 @@ sub BuildLinkHash {
 		$self->{_link}{$webLink} = 'visited';
 		$self->_parsePageContent($obj->{_content});
 
+		print "Test1\n";
 
 		if ($TRYCOUNT >= $MAXTRY ) {
 			die "issue in connection";
@@ -77,15 +78,13 @@ sub BuildLinkHash {
 
 	}
 
+	return $self;
 }
 
 
 sub _parsePageContent {
 
 	my ($self,$file_content) = @_;
-
-	my ($self,$file_content) = @_;
-
 
 	my $title         = "";
 	my $charEncode    = "";
@@ -97,33 +96,60 @@ sub _parsePageContent {
 	my $tree = HTML::TreeBuilder->new();
 	$tree->parse($file_content);
 
+	#print "$file_content\n";
 	#to extract link of all documentary
 	#<div class="wrapexcerpt">
-	my (@post) = $tree->look_down(_tag,'class','wrapexcerpt');
+	my (@post) = $tree->look_down(_tag,'div','class','wrapexcerpt');
+	#<h2 class="postTitle">
+	#<a title="To the Last Drop" href="http://topdocumentaryfilms.com/last-drop/">To the Last Drop</a>
+	#</h2>
 	foreach my $post (@post) {
 
+		my $title    = "";
+		my $docLink  = "";
+
+		my $h1    = $post->look_down(_tag,'h2','class','postTitle');
+		my $t     = $h1->look_down(_tag,'a');
+		
+		my $title   = $t->as_text;
+		my $docLink = $t->attr('href'); 
+
+		if ( $title ne ''  && $docLink  ne '' ) {
+			if ( ! (exists $self->{_doc_link}{$docLink}{title} )) {
+				$self->{_doc_link}{$docLink}{title} = $title;
+			}
+		}
+
 	}
+
+
 
 	# <div class="pagination text_center">
 	# <span class="current">1</span>
 	# <a class="inactive" href="http://topdocumentaryfilms.com/all/page/2/">2</a>
+
 	my $link = "";
 	my %link = ();
-	my ($page) = $tree->look_down(_tag,'class','pagination text_center');
+	my ($page) = $tree->look_down(_tag,'div','class','pagination text_center');
+	
 	if ($page) {
 
 		my $linkFlag = 0;
 
-		my (@nextPage) = $page->look_down(_tag,'a','class','inactive'); 
+		my (@nextPage) = $page->look_down(_tag,'a','class','inactive'); 		
+
 		foreach my $nextPage (@nextPage) {
 			if ($nextPage) {
+
 				$link = $nextPage->attr('href');
 
-				if ($link !~ /$self->{_web_link}/ 
-					&& exists ($self->{_link}{$link})
-					&& $self->{_link}{$link} != /visited/
+				if ( ($link ne $self->{_web_link} )
+					&& ( ! (exists ( $self->{_link}{$link} ) ) )
+					&& ($self->{_link}{$link} ne 'visited')
 				) {
+
 					$self->{_web_link} = $link;
+					print "T3  : $self->{_web_link}\n";
 					$linkFlag = 1;
 					last;
 				}
