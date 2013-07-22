@@ -5,7 +5,7 @@ use HTML::TreeBuilder;
 sub new {
 	my $class = shift;
     my $self = {
-    	_title             => "",
+    	_title              => "",
     	_character_encoding => "",
     	_image_link         => "",
     	_vedio_link         => "",
